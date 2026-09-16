@@ -1,0 +1,27 @@
+* Usage
+
+Pick a location, a user type, and a call type. Optionally override the requester email or add free-text details, then /Log Call/.
+
+Location stays selected between calls, since you're usually sat in one place all session. User type, call type, email override and details all clear.
+
+Successful tickets appear in the session history sidebar as links. It's session-only, and won't be preserved through refreshes/closing and re-opening.
+
+Errors show inline under the button and keep the form populated, so you can fix an email typo and resubmit without re-picking everything.
+
+** Subject line
+The subject line is generated from the config variable =subjectTemplate=, using placeholder variables {location}, {userType}, {callType}.
+So a value of =QuickLog: {location}::{callType}= will resolve as, for example:
+#+begin_src
+  QuickLog: BatCave::Got attacked by bats
+#+end_src
+The description in each call isn't configurable for now.
+
+** Tags
+We've also got support for tags - there's a standard one added for quicklogs (defaulting to =QuickLog=), and optional additional ones for each location, user type, call type, or added when logging the call. The last per-call one might be useful when doing events (new student intake, power outage, mass password reset, GTA6 release). This will be more configurable in future, maybe.
+
+** Styling
+The basic appearance is defined in =src/style.css=, but this can be overridden if you want to recolour things.
+To do so, create a =userstyles.css= file in the =src= directory, then plug in whichever css rules you want to change. Anything left out stays as it was.
+Then rebuild. The console logs a line confirming the override was picked up - if you don't see it, check the filename.
+
+See [[file:configuration.org][Configuration]] for setting up call types, locations, and user types referenced above.

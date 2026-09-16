@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Quick Call Logger - Diagnostics</title>
+	</head>
+	<body>
+		<div id="main">
+			<h1>Diagnostics</h1>
+
+			<section>
+				<h3>Loaded configuration</h3>
+				<pre id="configSummary"></pre>
+			</section>
+
+			<section>
+				<h3>Test GET</h3>
+				<label class="field-label" for="testTicketId">Ticket ref to fetch</label>
+				<input type="text" id="testTicketId" placeholder="e.g. 12345" />
+				<button id="testGetBtn" type="button">Run GET</button>
+				<pre id="getResult"></pre>
+			</section>
+
+			<section>
+				<h3>Test POST</h3>
+				<label class="field-label" for="testEmail">Requester email</label>
+				<input type="email" id="testEmail" placeholder="e.g. homer.simpson@example.com" />
+
+				<label class="field-label" for="testNote">Extra note (optional)</label>
+				<textarea id="testNote" rows="3" placeholder="Additional details..."></textarea>
+
+				<button id="previewBtn" type="button">Preview payload</button>
+				<button id="testPostBtn" type="button">Run POST</button>
+				<pre id="postResult"></pre>
+			</section>
+		</div>
+
+		<script type="module" src="/src/diagnostics.ts"></script>
+	</body>
+</html>

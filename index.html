@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Quick Call Logger</title>
+	</head>
+	<body>
+
+		<div id="main">
+			<h1>Quick Call Logger</h1>
+
+			<section>
+				<h3>Location</h3>
+				<div class="grid" id="locationGrid"></div>
+			</section>
+
+			<section>
+				<h3>User Type</h3>
+				<div class="grid" id="userTypeGrid"></div>
+			</section>
+
+			<section>
+				<h3>Call Type</h3>
+				<div class="grid" id="callTypeGrid"></div>
+			</section>
+
+			<details id="advancedOptions">
+				<summary>More options</summary>
+
+				<div id="emailOverrideSection" style="display:none;">
+					<label class="field-label" for="emailOverride">
+						Override requester email (leave blank to use generic account)
+					</label>
+					<input type="email" id="emailOverride" placeholder="e.g. homer.simpson@example.com" />
+				</div>
+
+				<label class="field-label" for="customTag">Custom tag (optional)</label>
+				<input type="text" id="customTag" placeholder="e.g. event, urgency" />
+
+				<label class="field-label" for="extraText">Additional details (optional)</label>
+				<textarea id="extraText" rows="3" placeholder="Additional details..."></textarea>
+
+				<label class="field-label">
+					<input type="checkbox" id="leaveOpen" />
+					Leave call open (do not auto-close)
+				</label>
+
+				<label class="field-label">
+					<input type="checkbox" id="keepCustomTag" />
+					Don't clear custom tags on call logging
+				</label>
+
+			</details>
+
+			<button id="logCallBtn" disabled>Log Call</button>
+			<div id="status"></div>
+		</div>
+
+		<div id="sidebar">
+			<h3>Session History</h3>
+			<ul id="history"></ul>
+		</div>
+
+		<script type="module" src="/src/main.ts"></script>
+	</body>
+</html>

@@ -1,0 +1,19 @@
+* Diagnostics
+
+=diagnostics.html= is for checking your config and its validity. It shows the config it actually loaded (API key truncated, so it's safe enough to screenshot), where that config came from, and whether an external build failed to find its =config.js=.
+
+Then two tests:
+
+** GET
+Fetch an existing ticket by number. Confirms the domain is right and the API key is accepted, without creating anything.
+
+** POST
+Create a real ticket, using a hardcoded Server / Maintenance / Certificate profile plus your configured custom fields. "Preview payload" shows exactly what would be sent without sending it.
+(this profile is specific to the instance I have available, change it in source if you don't have this one)
+
+The POST test creates an actual ticket. Close or delete it afterwards - the page reminds you and links straight to it.
+
+** Reading failures
+Both tests distinguish between "the server answered and refused" and "the request never left the browser", which is the distinction that matters: the first is credentials or payload, the second is probably CORS preflight. The failure text tells you which and what to look for in the Network tab.
+
+See [[file:configuration.org][Configuration]] for connection details (domain, API key, agent/group IDs) referenced above.

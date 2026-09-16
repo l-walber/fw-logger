@@ -1,0 +1,55 @@
+* FW Quick Call Logger
+
+It's a web page that logs pre-defined calls into FreshService. For regular issues that need minimal info and no follow-up, but need to be tracked for stats.
+
+Compiles into a single html file that doesn't need installation or a server to run on.
+
+It's horribly over-built for what is basically just a button that pokes at an API, but it was an excuse to learn and do something useful in typescript.
+
+(these instructions presume a particular environment, so if you're using anything different to what I am you'll need to figure it out yourself)
+
+** Prereqs
+Install *node.js*, and optionally *just* for running the build commands.
+#+begin_src powershell
+  winget install -e --id OpenJS.NodeJS.LTS
+  winget install -e --id Casey.Just
+#+end_src
+
+Once you've got those, cd into the fw-logger directory and run:
+#+begin_src powershell
+  just install
+#+end_src
+will install the typescript stuff needed.
+
+(if you don't want to use /just/, read the justfile for commands, they're not that complicated)
+
+** Two builds
+There are two build flavours, and they differ only in where the settings live:
+- standalone: settings are baked into the html at build time. One file, nothing else to copy, but changing a value means rebuilding or editing the file directly.
+- external: settings live in a =config.js= file that sits next to the html and is read at page load. Two files to keep together, but the person using it can edit their own API key and agent id in a text editor without needing node installed.
+
+Hand out /external/ if someone else is going to plug in their own credentials. Use /standalone/ if it's just you, or a shared API key/logging user.
+
+Both flavours fall back to the (intentionally non-functional) defaults in =src/config.ts= for anything not specified. Don't edit =src/config.ts= directly.
+
+See [[file:docs/configuration.org][Configuration]] for how to set up either build.
+
+** Build
+#+begin_src powershell
+  just build
+#+end_src
+builds both flavours. =just build-standalone= or =just build-external= if you only want one.
+
+You get, in =dist/standalone= or =dist/external=:
+- =index.html=: the tool
+- =diagnostics.html=: a test page
+- and for external builds, =config.js= and =config.d.ts=.
+
+The standalone html has your API key sitting in the source, so treat the file as a credential and don't email it around (unless it's an intentionally shared key, but keep those safe too. Don't be an idiot).
+
+We've also got tests, to make sure stuff works as it should. =just test= and hope they're all green.
+
+** More documentation
+- [[file:docs/configuration.org][Configuration]] -- settings, connection details, locations, user/call types, custom fields
+- [[file:docs/usage.org][Usage]] -- using the tool day-to-day, subject templates, tags, styling
+- [[file:docs/diagnostics.org][Diagnostics]] -- checking your config and testing the API connection

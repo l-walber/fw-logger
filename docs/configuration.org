@@ -1,0 +1,103 @@
+* Configuration
+
+** Standalone builds
+Copy =src/userconfig.example.ts= to =src/userconfig.ts= and edit the values there. This way if you update the repo later your config is preserved and you won't have to reconstruct all your call types.
+
+#+begin_src typescript
+  export const userConfig: Partial<AppConfig> = {
+  	freshserviceDomain: "nuclearpowerplant.freshservice.com",
+  	apiKey: "abcd1234yourrealapikey",
+  	agentID: 123456,
+  	groupID: 987654,
+  };
+#+end_src
+
+** External builds
+Edit the =config.js= that lands in =dist/external= alongside the html. It's plain javascript, no build step:
+
+#+begin_src js
+  var QUICKLOG_CONFIG = {
+  	freshserviceDomain: "nuclearpowerplant.freshservice.com",
+  	apiKey: "abcd1234yourrealapikey",
+  	agentID: 123456,
+  	groupID: 987654,
+  	// ...
+  };
+#+end_src
+
+The shipped =config.d.ts= sits next to it purely so editors can offer completion and complain about typos. It isn't needed at runtime, but keep it around if you want the hints.
+
+If =config.js= is missing or has a syntax error the page loads with defaults and says so in the status line. The diagnostics page reports the same thing more loudly.
+
+** A note on overriding
+Both mechanisms replace whole top-level keys rather than merging into them. If you specify =callTypes= you're replacing the entire list, not adding to it. Same for =locations=, =userTypes= and =customFields=. This lets us provide example data in a simple way.
+
+** Connection details
+/freshserviceDomain/: the address of your FS instance.
+/apiKey/: The API key of the user you're logging calls as, usually the agent's, but maybe a service account. Needs appropriate permissions for logging calls.
+/agentID/: The agent id number of the user that'll be given the call. For our purposes, it's the person that's operating the tool. A number, not a string.
+/groupID/: And the group they work in. Also a number.
+
+** Locations
+An array of places you log calls from - maybe you have multiple drop-in locations, or different departments take calls.
+These items need an ID and a label (it's fine if they're the same value, as long as different locations have different ids):
+#+begin_src typescript
+  locations: [
+  	{ id: "bed", label: "Site A" },
+  	{ id: "site-bath", label: "Site B" },
+  	{ id: "beyond", label: "Remote" },
+  ],
+#+end_src
+
+** User types
+This tool is aimed at uni support calls, so different types of users exist. These need:
+/id/: unique identifier, used internally by the tool
+/label/: what they're referred to as: staff, student, guest, VIP, etc
+/defaultEmail/: the generic account calls are logged against. The UI shows an override box so you can record the actual user when it actually matters.
+
+#+begin_src typescript
+userTypes: [
+  { id: "staff", label: "Staff", defaultEmail: "regular.staff@yourorg.example" },
+  { id: "student", label: "Student", defaultEmail: "regular.student@yourorg.example" },
+  { id: "guest", label: "Guest", defaultEmail: "guest@yourorg.example" },
+],
+#+end_src
+
+Give every user type a /defaultEmail/. The override box only appears for user types that have one, so a type without it has no way to supply a requester and the API will reject the ticket.
+
+** Call types
+The common problems you want recorded, that don't require much more info. Password resets, lost files, general enquiries, complaints about the weather.
+Each entry has:
+/id/: Short internal identifier, must be unique.
+/label/: Text shown on the button.
+/category/: Freshservice ticket "Category" value. Must match a category that exists in your Freshservice instance exactly (including capitalisation).
+/subCategory/: Freshservice ticket "Sub Category" value. Must be a valid sub-category of the chosen /category/ in your Freshservice setup.
+/item/: /(optional)/ Freshservice ticket "Item" value, for categories that go one level deeper. Sent to the API as =item_category=. Omit entirely if the category/sub-category combination doesn't use an item level entry.
+
+#+begin_src typescript
+callTypes: [
+  { id: "password-reset", label: "Password Reset", category: "Accounts", subCategory: "Password" },
+  { id: "printer", label: "Printer Issue", category: "Hardware", subCategory: "Printer", item: "Toner" },
+  { id: "network", label: "Network Issue", category: "Network", subCategory: "Connectivity" },
+  { id: "other", label: "Other", category: "General", subCategory: "Other" },
+],
+#+end_src
+
+Freshservice validates these as a strict hierarchy, so a sub-category that isn't a child of the given category is a 400 even when both names exist on their own.
+
+** Custom fields
+Freshservice instances usually have mandatory custom ticket fields, and they're different everywhere, so they're configurable rather than hardcoded. Whatever you put in /customFields/ is sent as =custom_fields= on every ticket:
+
+#+begin_src typescript
+customFields: {
+  type_of_issue: "Service Request",
+  ticket_source: "Self Service Portal",
+},
+#+end_src
+
+Keys must match the API names in your instance (nearly, if you look in the API they've usually got some ID appended that can be ignored here), or the whole POST is rejected. If a key doesn't exist you'll get a 400 that names it. Leave it as ={}= if your instance has no mandatory custom fields - the field is omitted from the payload entirely when empty.
+
+To find the API names fetch an existing ticket with the diagnostics GET test and read the =custom_fields= object in the response.
+(there's probably an admin view for this, but I'm not looking into that)
+
+See [[file:../README.org][README]] for build instructions, or [[file:diagnostics.org][Diagnostics]] for verifying your setup.
